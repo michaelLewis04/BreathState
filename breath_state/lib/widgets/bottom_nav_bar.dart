@@ -1,42 +1,44 @@
+import 'package:breath_state/providers/nav_bar_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class BottomNavBar extends StatelessWidget {
-  final int currentIndex;
-  final Function(int) onTap;
+  const BottomNavBar({super.key});
 
-  const BottomNavBar({
-    super.key,
-    required this.currentIndex,
-    required this.onTap,
-  });
-
+ 
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      currentIndex: currentIndex,
-      onTap: onTap,
-      items: const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home),
-          label: 'Home',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.self_improvement),
-          label: 'Guided Breathing',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.mic),
-          label: 'Record',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.medical_services),
-          label: 'Doctor',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.settings),
-          label: 'Settings',
-        ),
-      ],
+    return Consumer<NavBarProvider>(
+      builder: (context, navBarProvider, child) {
+        return BottomNavigationBar(
+          currentIndex: navBarProvider.getIndex(),
+          onTap: (index) {
+            context.read<NavBarProvider>().changeIndex(index);
+          },
+          type: BottomNavigationBarType.fixed,
+          selectedItemColor: Colors.blue,
+          unselectedItemColor: Colors.grey,
+          items: const [
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.self_improvement),
+              label: 'Breathing',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.my_location_outlined),
+              label: 'Record',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.medical_services),
+              label: 'Doctor',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.settings),
+              label: 'Settings',
+            ),
+          ],
+        );
+      },
     );
   }
 }
