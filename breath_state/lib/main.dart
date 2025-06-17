@@ -32,7 +32,7 @@ class _MyAppState extends State<MyApp> {
     HomeScreen(),
     GuidedBreathingScreen(),
     RecordScreen(),
-    DoctorScreen(),
+    DoctorScreen(), 
     SettingsScreen(),
   ];
 
