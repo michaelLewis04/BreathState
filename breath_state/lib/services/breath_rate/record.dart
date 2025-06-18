@@ -11,7 +11,7 @@ class SoundRecorder {
   final int kSAMPLERATE = 8000;
   final int kNUMBEROFCHANNELS = 1;
 
-  var recorderDataController = StreamController<List<Int16List>>();
+  late var recorderDataController;
 
   //TODO :Make open Recorder in initState
 
@@ -38,7 +38,7 @@ class SoundRecorder {
       developer.log("Unable to open recorder");
       throw Exception("Unable to open recorder");
     }
-
+    recorderDataController = StreamController<List<Int16List>>();
     await _myRecorder.startRecorder(
       codec: Codec.pcm16,
       sampleRate: kSAMPLERATE,
@@ -53,8 +53,10 @@ class SoundRecorder {
     await Future.delayed(const Duration(seconds: 30));
 
     await stopRecord();
-  
-    return await P.calculateBreathRate();
+
+    int breathingRate = await P.calculateBreathRate();
+
+    return breathingRate;
   }
 
   Future<void> stopRecord() async {

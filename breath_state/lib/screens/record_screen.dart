@@ -11,11 +11,10 @@ class RecordScreen extends StatefulWidget {
 }
 
 class _RecordScreenState extends State<RecordScreen> {
-  final SoundRecorder _recorder = SoundRecorder();
+  late SoundRecorder _recorder;
   //TODO Stream the breathing rate
-  // StreamController breathingRate = StreamController<int>();
 
-  int breathingRate = -1;
+  int breathingRate = -2;
   @override
   void dispose() {
     _recorder.dispose();
@@ -30,20 +29,41 @@ class _RecordScreenState extends State<RecordScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Text("Breathing Rate: ${breathingRate}"),
+            if (breathingRate == -2)
+              const Text("Let's calculate breathing rate (30s)")
+            else if (breathingRate == -1)
+              const Text("Calculating...")
+            else ...[
+              const Text("Breathing Rate:", style: TextStyle(fontSize: 24)),
+              Text(
+                "$breathingRate",
+                style: const TextStyle(
+                  fontSize: 72,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue,
+                ),
+              ),
+            ],
+
             TextButton(
               onPressed: () async {
+                _recorder = SoundRecorder();
+                breathingRate = -1;
+                setState(() {});
                 breathingRate = await _recorder.startRecord();
                 setState(() {});
               },
-              child: const Text("Start Recording"),
+              child: const Text("Record Breathing Rate"),
             ),
-            TextButton(
-              onPressed: () async {
-                await _recorder.stopRecord();
-              },
-              child: const Text("Stop Recording"),
-            ),
+
+            //TODO : Add feature to stop recording and breathing rate
+
+            // TextButton(
+            //   onPressed: () async {
+            //     await _recorder.stopRecord();
+            //   },
+            //   child: const Text("Stop Recording"),
+            // ),
           ],
         ),
       ),
