@@ -45,7 +45,7 @@ class _RecordScreenState extends State<RecordScreen> {
               ),
             ],
 
-            TextButton(
+            ElevatedButton(
               onPressed: () async {
                 _recorder = SoundRecorder();
                 breathingRate = -1;
@@ -53,8 +53,24 @@ class _RecordScreenState extends State<RecordScreen> {
                 breathingRate = await _recorder.startRecord();
                 setState(() {});
               },
+
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 112, 180, 236),
+                foregroundColor: Colors.black,
+              ),
               child: const Text("Record Breathing Rate"),
             ),
+
+            // TextButton(
+            //   onPressed: () async {
+            //     _recorder = SoundRecorder();
+            //     breathingRate = -1;
+            //     setState(() {});
+            //     breathingRate = await _recorder.startRecord();
+            //     setState(() {});
+            //   },
+            //   child: const Text("Record Breathing Rate"),
+            // ),
 
             //TODO : Add feature to stop recording and breathing rate
 
