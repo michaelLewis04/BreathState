@@ -10,6 +10,7 @@ import 'screens/guided_breathing_screen.dart';
 
 import 'dart:developer' as developer;
 
+//TODO: Make all the sizes defined be wrt to context size
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
@@ -32,7 +33,7 @@ class _MyAppState extends State<MyApp> {
     HomeScreen(),
     GuidedBreathingScreen(),
     RecordScreen(),
-    DoctorScreen(), 
+    DoctorScreen(),
     SettingsScreen(),
   ];
 
