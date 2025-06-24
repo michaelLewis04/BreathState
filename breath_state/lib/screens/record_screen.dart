@@ -34,7 +34,10 @@ class _RecordScreenState extends State<RecordScreen> {
             else if (breathingRate == -1)
               const Text("Calculating...")
             else ...[
-              const Text("Breathing Rate:", style: TextStyle(fontSize: 24)),
+              const Text(
+                "Breathing Rate(per min):",
+                style: TextStyle(fontSize: 24),
+              ),
               Text(
                 "$breathingRate",
                 style: const TextStyle(

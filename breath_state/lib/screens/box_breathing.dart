@@ -1,32 +1,31 @@
+import 'package:breath_state/widgets/guided_breathing.dart';
 import 'package:flutter/material.dart';
 
-class BoxBreathing extends StatefulWidget {
+class BoxBreathing extends StatelessWidget {
   const BoxBreathing({super.key});
 
   @override
-  State<BoxBreathing> createState() => _BoxBreathingState();
-}
-
-class _BoxBreathingState extends State<BoxBreathing> {
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(title: Text("Box Breathing Screen"), centerTitle: true),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text("Box Breathing animation"),
+            const SizedBox(height: 150),
+            GuidedBreathing(
+              inhaleDuration: const Duration(seconds: 4),
+              holdDuration: const Duration(seconds: 4),
+              exhaleDuration: const Duration(seconds: 4),
+            ),
+            const SizedBox(height: 150),
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 250, 112, 102),
+                backgroundColor: Colors.redAccent,
                 foregroundColor: Colors.white,
               ),
-              child: Text("Stop"),
+              child: const Text("Stop"),
             ),
           ],
         ),
