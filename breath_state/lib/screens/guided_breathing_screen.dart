@@ -1,4 +1,3 @@
-import 'package:breath_state/screens/box_breathing.dart';
 import 'package:flutter/material.dart';
 import 'package:breath_state/widgets/guided_breathing.dart';
 
