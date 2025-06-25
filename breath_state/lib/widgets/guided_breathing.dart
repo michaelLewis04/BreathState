@@ -32,6 +32,8 @@ class _GuidedBreathingState extends State<GuidedBreathing>
   int _introSecondsLeft = 5;
   int _phaseSecondsLeft = 0;
 
+  //TODO: Add vibration when state change in breathing
+
   @override
   void initState() {
     super.initState();
@@ -117,7 +119,12 @@ class _GuidedBreathingState extends State<GuidedBreathing>
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Scaffold(
+      body: Center(
+        child: Column(
+          children: [
+            const SizedBox(height: 150),
+            Column(
       children: [
         const SizedBox(height: 50),
         Stack(
@@ -180,6 +187,21 @@ class _GuidedBreathingState extends State<GuidedBreathing>
           style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
         ),
       ],
+    ),
+            const SizedBox(height: 150),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text("Stop"),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

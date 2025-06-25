@@ -1,5 +1,6 @@
 import 'package:breath_state/screens/box_breathing.dart';
 import 'package:flutter/material.dart';
+import 'package:breath_state/widgets/guided_breathing.dart';
 
 class GuidedBreathingScreen extends StatefulWidget {
   const GuidedBreathingScreen({super.key});
@@ -22,7 +23,14 @@ class _GuidedBreathingScreenState extends State<GuidedBreathingScreen> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => BoxBreathing()),
+                    MaterialPageRoute(
+                      builder:
+                          (context) => GuidedBreathing(
+                            inhaleDuration: const Duration(seconds: 4),
+                            holdDuration: const Duration(seconds: 4),
+                            exhaleDuration: const Duration(seconds: 4),
+                          ),
+                    ),
                   );
                 },
                 style: ButtonStyle(
@@ -36,7 +44,19 @@ class _GuidedBreathingScreenState extends State<GuidedBreathingScreen> {
                 child: const Text("Box Breathing"),
               ),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder:
+                          (context) => GuidedBreathing(
+                            inhaleDuration: const Duration(seconds: 4),
+                            holdDuration: const Duration(seconds: 0),
+                            exhaleDuration: const Duration(seconds: 4),
+                          ),
+                    ),
+                  );
+                },
                 style: ButtonStyle(
                   fixedSize: WidgetStateProperty.all(const Size(150, 200)),
                   shape: WidgetStateProperty.all(
@@ -45,7 +65,9 @@ class _GuidedBreathingScreenState extends State<GuidedBreathingScreen> {
                     ),
                   ),
                 ),
-                child: const Text("Button 2"),
+                child: const Text(
+                  "Equal Breathing",
+                ), //TODO: Remove the transition to hold in the split second
               ),
             ],
           ),
@@ -53,7 +75,19 @@ class _GuidedBreathingScreenState extends State<GuidedBreathingScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder:
+                          (context) => GuidedBreathing(
+                            inhaleDuration: const Duration(seconds: 4),
+                            holdDuration: const Duration(seconds: 7),
+                            exhaleDuration: const Duration(seconds: 8),
+                          ),
+                    ),
+                  );
+                },
                 style: ButtonStyle(
                   fixedSize: WidgetStateProperty.all(const Size(150, 200)),
                   shape: WidgetStateProperty.all(
@@ -62,7 +96,7 @@ class _GuidedBreathingScreenState extends State<GuidedBreathingScreen> {
                     ),
                   ),
                 ),
-                child: const Text("Button 3"),
+                child: const Text("4-7-8 Breathing"),
               ),
               ElevatedButton(
                 onPressed: () {},
