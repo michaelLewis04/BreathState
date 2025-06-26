@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 
 class GuidedBreathing extends StatefulWidget {
@@ -65,9 +66,14 @@ class _GuidedBreathingState extends State<GuidedBreathing>
 
   void _doInhale() {
     setState(() => _phaseText = "Inhale");
-    _controller.duration = widget.inhaleDuration;
+    _controller.duration =
+        widget.inhaleDuration; //TODO Make sure they are synchronised
     _startCountdown(widget.inhaleDuration);
     _controller.forward().whenComplete(() {
+      if (widget.holdDuration == Duration.zero) {
+        _doExhale();
+        return;
+      }
       _doHold(afterInhale: true);
     });
   }
@@ -77,6 +83,10 @@ class _GuidedBreathingState extends State<GuidedBreathing>
     _controller.duration = widget.exhaleDuration;
     _startCountdown(widget.exhaleDuration);
     _controller.reverse().whenComplete(() {
+      if (widget.holdDuration == Duration.zero) {
+        _doInhale();
+        return;
+      }
       _doHold(afterInhale: false);
     });
   }
@@ -125,69 +135,77 @@ class _GuidedBreathingState extends State<GuidedBreathing>
           children: [
             const SizedBox(height: 150),
             Column(
-      children: [
-        const SizedBox(height: 50),
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            // Outer fixed circle
-            Container(
-              width: maxSize + 20,
-              height: maxSize + 20,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.grey.withOpacity(0.2),
-              ),
-            ),
-            // Inner fixed circle
-            Container(
-              width: minSize - 20,
-              height: minSize - 20,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.grey.withOpacity(0.2),
-              ),
-            ),
-            // Animated breathing circle
-            AnimatedBuilder(
-              animation: _animation,
-              builder: (context, child) {
-                return Container(
-                  width: _animation.value,
-                  height: _animation.value,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Color.fromARGB(255, 109, 183, 243),
+              children: [
+                const SizedBox(height: 50),
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // Outer fixed circle
+                    Container(
+                      width: maxSize + 20,
+                      height: maxSize + 20,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.grey.withOpacity(0.2),
+                      ),
+                    ),
+                    // Inner fixed circle
+                    Container(
+                      width: minSize - 20,
+                      height: minSize - 20,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.grey.withOpacity(0.2),
+                      ),
+                    ),
+                    // Animated breathing circle
+                    AnimatedBuilder(
+                      animation: _animation,
+                      builder: (context, child) {
+                        return Container(
+                          width: _animation.value,
+                          height: _animation.value,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Color.fromARGB(255, 109, 183, 243),
+                          ),
+                          child: Center(
+                            child:
+                                _introSecondsLeft > 0
+                                    ? const SizedBox.shrink()
+                                    : AnimatedOpacity(
+                                      opacity:
+                                          _phaseSecondsLeft == 1 ? 0.0 : 1.0,
+                                      duration: const Duration(
+                                        milliseconds: 600,
+                                      ),
+                                      child: Text(
+                                        '$_phaseSecondsLeft',
+                                        style: const TextStyle(
+                                          fontSize: 36,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 30),
+                Text(
+                  _introSecondsLeft > 0
+                      ? "Relax... $_introSecondsLeft"
+                      : _phaseText,
+                  style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
                   ),
-                  child: Center(
-                    child:
-                        _introSecondsLeft > 0
-                            ? const SizedBox.shrink()
-                            : AnimatedOpacity(
-                              opacity: _phaseSecondsLeft == 1 ? 0.0 : 1.0,
-                              duration: const Duration(milliseconds: 600),
-                              child: Text(
-                                '$_phaseSecondsLeft',
-                                style: const TextStyle(
-                                  fontSize: 36,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                  ),
-                );
-              },
+                ),
+              ],
             ),
-          ],
-        ),
-        const SizedBox(height: 30),
-        Text(
-          _introSecondsLeft > 0 ? "Relax... $_introSecondsLeft" : _phaseText,
-          style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-        ),
-      ],
-    ),
             const SizedBox(height: 150),
             ElevatedButton(
               onPressed: () {
