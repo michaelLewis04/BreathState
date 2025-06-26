@@ -9,6 +9,7 @@ class GuidedBreathingScreen extends StatefulWidget {
 }
 
 class _GuidedBreathingScreenState extends State<GuidedBreathingScreen> {
+  Color buttonColor = const Color.fromARGB(255, 177, 229, 254);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,6 +40,7 @@ class _GuidedBreathingScreenState extends State<GuidedBreathingScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
+                  backgroundColor: WidgetStatePropertyAll<Color>(buttonColor),
                 ),
                 child: const Text("Box Breathing"),
               ),
@@ -63,10 +65,11 @@ class _GuidedBreathingScreenState extends State<GuidedBreathingScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
+                  backgroundColor: WidgetStatePropertyAll<Color>(buttonColor),
                 ),
                 child: const Text(
                   "Equal Breathing",
-                ), //TODO: Remove the transition to hold in the split second
+                ), 
               ),
             ],
           ),
@@ -94,11 +97,24 @@ class _GuidedBreathingScreenState extends State<GuidedBreathingScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
+                  backgroundColor: WidgetStatePropertyAll<Color>(buttonColor),
                 ),
                 child: const Text("4-7-8 Breathing"),
               ),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder:
+                          (context) => GuidedBreathing(
+                            inhaleDuration: const Duration(seconds: 3),
+                            holdDuration: Duration(seconds: 0),
+                            exhaleDuration: Duration(seconds: 9),
+                          ),
+                    ),
+                  );
+                },
                 style: ButtonStyle(
                   fixedSize: WidgetStateProperty.all(const Size(150, 200)),
                   shape: WidgetStateProperty.all(
@@ -106,8 +122,9 @@ class _GuidedBreathingScreenState extends State<GuidedBreathingScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
+                  backgroundColor: WidgetStatePropertyAll<Color>(buttonColor),
                 ),
-                child: const Text("Button 4"),
+                child: const Text("Extended Breathing"),
               ),
             ],
           ),
