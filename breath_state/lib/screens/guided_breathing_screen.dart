@@ -67,9 +67,7 @@ class _GuidedBreathingScreenState extends State<GuidedBreathingScreen> {
                   ),
                   backgroundColor: WidgetStatePropertyAll<Color>(buttonColor),
                 ),
-                child: const Text(
-                  "Equal Breathing",
-                ), 
+                child: const Text("Equal Breathing"),
               ),
             ],
           ),
@@ -115,6 +113,7 @@ class _GuidedBreathingScreenState extends State<GuidedBreathingScreen> {
                     ),
                   );
                 },
+                //TODO: Add a custom breathing screen for user to enter
                 style: ButtonStyle(
                   fixedSize: WidgetStateProperty.all(const Size(150, 200)),
                   shape: WidgetStateProperty.all(
