@@ -1,7 +1,10 @@
 import 'dart:async';
-
+import 'dart:developer' as Developer;
+import 'package:breath_state/providers/polar_connect_provider.dart';
 import 'package:breath_state/services/breath_rate/record.dart';
+import 'package:breath_state/services/heart_rate/polar_connect.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class RecordScreen extends StatefulWidget {
   const RecordScreen({super.key});
@@ -47,7 +50,7 @@ class _RecordScreenState extends State<RecordScreen> {
                 ),
               ),
             ],
-
+            //TODO Multiple instances created if button clicked twice
             ElevatedButton(
               onPressed: () async {
                 _recorder = SoundRecorder();
@@ -62,6 +65,34 @@ class _RecordScreenState extends State<RecordScreen> {
                 foregroundColor: Colors.black,
               ),
               child: const Text("Record Breathing Rate"),
+            ),
+
+            Consumer<PolarConnectProvider>(
+              builder: (context, polarConnectProvider, child) {
+                return ElevatedButton(
+                  onPressed: () async {
+                    PolarConnect? polar =
+                        polarConnectProvider.getPolarConnect();
+                    if (polar == null) {
+                      Developer.log("Connect first");
+                    } else {
+                      try {
+                       
+                        await polar.startRecording();
+                        Developer.log("Recording done");
+                      } catch (e) {
+                        Developer.log("Error in recording: $e");
+                      }
+                    }
+                  },
+
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 112, 180, 236),
+                    foregroundColor: Colors.black,
+                  ),
+                  child: const Text("Record Heart Rate"),
+                );
+              },
             ),
 
             // TextButton(
