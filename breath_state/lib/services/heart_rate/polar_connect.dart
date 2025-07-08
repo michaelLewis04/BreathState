@@ -15,26 +15,22 @@ class PolarConnect {
   //TODO Add reconnect, see if connection gets broken
 
   Future<void> connectToPolar() async {
-    //TODO Add scanner to scan devices, called from the setting screen
-
     developer.log("Searching device");
-    
+
     try {
       await polar.connectToDevice(identifier);
       await Future.delayed(const Duration(seconds: 2));
       developer.log("Found device");
-    } catch (e){
+    } catch (e) {
       developer.log("Error connectiong $e");
     }
-    
-    
+
     return;
   }
 
   // StreamController sc = StreamController<int>();
 
   void getPolarBatteryLevel() {
-
     // sc.sink.add(polar.batteryLevel);
   }
 
