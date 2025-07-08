@@ -74,6 +74,7 @@ class _RecordScreenState extends State<RecordScreen> {
                     PolarConnect? polar =
                         polarConnectProvider.getPolarConnect();
                     if (polar == null) {
+                      // TODO Add alert pop up
                       Developer.log("Connect first");
                     } else {
                       try {
