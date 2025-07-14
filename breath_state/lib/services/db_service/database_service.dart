@@ -9,6 +9,7 @@ class DatabaseService {
   DatabaseService._constructor();
 
   final String _table_name = "breathe_rate";
+  
 
   Future<Database> get database async {
     if (_db != null) {
