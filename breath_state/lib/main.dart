@@ -9,8 +9,6 @@ import 'widgets/bottom_nav_bar.dart';
 import 'screens/home_screen.dart';
 import 'screens/guided_breathing_screen.dart';
 
-import 'dart:developer' as developer;
-
 //TODO: Make all the sizes defined be wrt to context size
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,6 +42,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Consumer<NavBarProvider>(
         builder: (context, model, child) {
           return Scaffold(

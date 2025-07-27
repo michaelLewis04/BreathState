@@ -5,10 +5,9 @@ import 'package:flutter/widgets.dart';
 
 class PolarConnectProvider extends ChangeNotifier {
   PolarConnect? _polarConnect;
-
+  //NIT : Could use only 1 instance of Polar Connect
   Future<void> connectToPolarSensor(String identifier) async {
     _polarConnect = PolarConnect(identifier: identifier);
-    await _polarConnect?.connectToPolar();
   }
 
   PolarConnect? getPolarConnect() {

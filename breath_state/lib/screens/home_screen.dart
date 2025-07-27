@@ -17,12 +17,12 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    loadData(); 
+    loadData();
   }
 
   Future<void> loadData() async {
-    final db = DatabaseService.instance;
-    final data = await db.getData();
+    final dbService = DatabaseService.instance;
+    final data = await dbService.getData();
     setState(() {
       rows = data;
       isLoading = false;
@@ -32,24 +32,25 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Breathing Records"),centerTitle: true,),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator(),)
-          : rows.isEmpty
+      appBar: AppBar(title: const Text("Breathing Records"), centerTitle: true),
+      body:
+          isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : rows.isEmpty
               ? const Center(child: Text("No data available"))
               : RefreshIndicator(
-                  onRefresh: loadData, 
-                  child: ListView.builder(
-                    itemCount: rows.length,
-                    itemBuilder: (context, index) {
-                      final row = rows[index];
-                      return ListTile(
-                        title: Text("Date: ${row['date']}"),
-                        subtitle: Text("Rate: ${row['rate']}"),
-                      );
-                    },
-                  ),
+                onRefresh: loadData,
+                child: ListView.builder(
+                  itemCount: rows.length,
+                  itemBuilder: (context, index) {
+                    final row = rows[index];
+                    return ListTile(
+                      title: Text("Date: ${row['date']}"),
+                      subtitle: Text("Rate: ${row['rate']}"),
+                    );
+                  },
                 ),
+              ),
     );
   }
 }
