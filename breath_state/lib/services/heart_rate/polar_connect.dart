@@ -1,14 +1,17 @@
 import 'dart:async';
 import 'dart:developer' as developer;
-
-import 'package:flutter/material.dart';
 import 'package:polar/polar.dart';
 
 //TODO Add permisions pop up for bluetooth
+//TODO Add a dispose
 
 class PolarConnect {
   final String identifier;
   final Polar polar = Polar();
+
+  StreamSubscription? hrSubscription;
+  StreamSubscription? ecgSubscription;
+  StreamSubscription? accSubscription;
 
   PolarConnect({required this.identifier});
 
@@ -19,40 +22,64 @@ class PolarConnect {
 
     try {
       await polar.connectToDevice(identifier);
-      await Future.delayed(const Duration(seconds: 2));
-      developer.log("Found device");
+      await polar.sdkFeatureReady.firstWhere(
+        (e) =>
+            e.identifier == identifier &&
+            e.feature == PolarSdkFeature.onlineStreaming,
+      );
+
+      developer.log("Device connected and ready for streaming.");
     } catch (e) {
-      developer.log("Error connectiong $e");
+      developer.log("Error connecting: $e");
     }
 
     return;
   }
 
-  // StreamController sc = StreamController<int>();
-
   void getPolarBatteryLevel() {
-    // sc.sink.add(polar.batteryLevel);
+    //TODO Add battery level
   }
 
   Future<void> startRecording() async {
-    await polar.sdkFeatureReady.firstWhere(
-      (e) =>
-          e.identifier == identifier &&
-          e.feature == PolarSdkFeature.onlineStreaming,
+    await connectToPolar();
+    final availableTypes = await polar.getAvailableOnlineStreamDataTypes(
+      identifier,
     );
+    developer.log('Available data types: $availableTypes');
 
-    polar.startHrStreaming(identifier).listen((hrData) {
-      final hr = hrData.samples[0];
-      final rrRhs = hrData.samples[1];
-      developer.log("HR value : $hr");
-      developer.log("rrRhs value: $rrRhs");
-      //TODO: Add streamer
-    });
+    if (availableTypes.contains(PolarDataType.hr)) {
+      hrSubscription = polar.startHrStreaming(identifier).listen((data) {
+        for (final sample in data.samples) {
+          developer.log('HR: ${sample.hr} bpm');
+        }
+      }, onError: (err) => developer.log('HR streaming error: $err'));
+    }
 
-    polar.startEcgStreaming(identifier).listen((ecgData) {
-      final ecgValue = ecgData.samples;
-      developer.log("ECG value: $ecgValue");
-    });
-    //TODO Add other metrics and recording
+    if (availableTypes.contains(PolarDataType.ecg)) {
+      ecgSubscription = polar.startEcgStreaming(identifier).listen((data) {
+        developer.log('ECG received with ${data.samples.length} samples');
+      }, onError: (err) => developer.log('ECG streaming error: $err'));
+    }
+
+    if (availableTypes.contains(PolarDataType.acc)) {
+      accSubscription = polar.startAccStreaming(identifier).listen((data) {
+        developer.log('ACC received with ${data.samples.length} samples');
+      }, onError: (err) => developer.log('ACC streaming error: $err'));
+    }
   }
+
+  Future<void> stopRecording() async {
+    try {
+      await hrSubscription?.cancel();
+      await ecgSubscription?.cancel();
+      await accSubscription?.cancel();
+      await polar.disconnectFromDevice(identifier);
+      developer.log('All streams cancelled and device disconnected.');
+    } catch (e) {
+      developer.log('Error stopping recording: $e');
+    }
+  }
+
+  //TODO Add streamer
+  //TODO Add other metrics and recording
 }

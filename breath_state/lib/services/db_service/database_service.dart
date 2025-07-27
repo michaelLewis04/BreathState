@@ -37,7 +37,7 @@ class DatabaseService {
   Future<void> addData(int rate) async {
     Database db = await database;
     final now = DateTime.now();
-  final formattedDateTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
+    final formattedDateTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
     int status = await db.insert(_table_name, {
       "date": formattedDateTime,
       "rate": rate,

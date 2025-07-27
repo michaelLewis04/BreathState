@@ -1,5 +1,4 @@
-import 'dart:async';
-import 'dart:developer' as Developer;
+import 'dart:developer' as developer;
 import 'package:breath_state/providers/polar_connect_provider.dart';
 import 'package:breath_state/services/breath_rate/record.dart';
 import 'package:breath_state/services/heart_rate/polar_connect.dart';
@@ -67,6 +66,7 @@ class _RecordScreenState extends State<RecordScreen> {
               child: const Text("Record Breathing Rate"),
             ),
 
+            //TODO When start recording, connect again coz first time we disconnect (connect in this, in setting connect store the identifier)
             Consumer<PolarConnectProvider>(
               builder: (context, polarConnectProvider, child) {
                 return ElevatedButton(
@@ -75,14 +75,13 @@ class _RecordScreenState extends State<RecordScreen> {
                         polarConnectProvider.getPolarConnect();
                     if (polar == null) {
                       // TODO Add alert pop up
-                      Developer.log("Connect first");
+                      developer.log("Connect first");
                     } else {
                       try {
-                       
                         await polar.startRecording();
-                        Developer.log("Recording done");
+                        developer.log("Recording done");
                       } catch (e) {
-                        Developer.log("Error in recording: $e");
+                        developer.log("Error in recording: $e");
                       }
                     }
                   },
@@ -95,26 +94,32 @@ class _RecordScreenState extends State<RecordScreen> {
                 );
               },
             ),
+            Consumer<PolarConnectProvider>(
+              builder: (context, polarConnectProvider, child) {
+                return ElevatedButton(
+                  onPressed: () async {
+                    PolarConnect? polar =
+                        polarConnectProvider.getPolarConnect();
+                    if (polar == null) {
+                      // TODO Add alert pop up
+                      developer.log("Already disconnected");
+                    } else {
+                      try {
+                        await polar.stopRecording();
+                      } catch (e) {
+                        developer.log("Error in stop recording: $e");
+                      }
+                    }
+                  },
 
-            // TextButton(
-            //   onPressed: () async {
-            //     _recorder = SoundRecorder();
-            //     breathingRate = -1;
-            //     setState(() {});
-            //     breathingRate = await _recorder.startRecord();
-            //     setState(() {});
-            //   },
-            //   child: const Text("Record Breathing Rate"),
-            // ),
-
-            //TODO : Add feature to stop recording and breathing rate
-
-            // TextButton(
-            //   onPressed: () async {
-            //     await _recorder.stopRecord();
-            //   },
-            //   child: const Text("Stop Recording"),
-            // ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 112, 180, 236),
+                    foregroundColor: Colors.black,
+                  ),
+                  child: const Text("Stop Recording HR"),
+                );
+              },
+            ),
           ],
         ),
       ),

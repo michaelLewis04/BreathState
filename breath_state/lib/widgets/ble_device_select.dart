@@ -26,6 +26,7 @@ class _BleDeviceSelectState extends State<BleDeviceSelect> {
 
   @override
   void dispose() {
+    _ble.clearDevices();
     super.dispose();
   }
 
@@ -46,8 +47,8 @@ class _BleDeviceSelectState extends State<BleDeviceSelect> {
                     ),
                     subtitle: Text("ID: ${device.id}\nRSSI: ${device.rssi}"),
                     onTap: () {
-                    Navigator.pop(context, device.id); 
-                  },
+                      Navigator.pop(context, device.id);
+                    },
                   );
                 },
               ),
