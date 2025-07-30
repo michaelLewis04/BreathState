@@ -47,7 +47,12 @@ class _BleDeviceSelectState extends State<BleDeviceSelect> {
                     ),
                     subtitle: Text("ID: ${device.id}\nRSSI: ${device.rssi}"),
                     onTap: () {
-                      Navigator.pop(context, device.id);
+                      String name = device.name;
+                      if (name.startsWith("Polar") && name.length >= 8) {
+                        Navigator.pop(context, name.substring(name.length - 8));
+                      } else {
+                        Navigator.pop(context, device.id);
+                      }
                     },
                   );
                 },

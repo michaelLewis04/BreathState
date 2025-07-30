@@ -3,6 +3,7 @@ import 'package:breath_state/services/ble_service/ble_scanning.dart';
 import 'package:breath_state/widgets/ble_device_select.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:developer' as developer;
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -29,9 +30,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   context,
                   MaterialPageRoute(builder: (_) => BleDeviceSelect()),
                 );
-
-                //TODO See how to get the identifier from the mac id (its ig the last string mmetnitoned on the device name)
-                _selectDeviceUUID = "E3A0912D";
+                developer.log("Selected Device UUID: $_selectDeviceUUID");
                 if (_selectDeviceUUID != null) {
                   setState(() {});
                   await context

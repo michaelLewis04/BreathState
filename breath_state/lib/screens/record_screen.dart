@@ -1,4 +1,5 @@
 import 'dart:developer' as developer;
+import 'package:breath_state/providers/nav_bar_provider.dart';
 import 'package:breath_state/providers/polar_connect_provider.dart';
 import 'package:breath_state/services/breath_rate/record.dart';
 import 'package:breath_state/services/heart_rate/polar_connect.dart';
@@ -14,8 +15,10 @@ class RecordScreen extends StatefulWidget {
 
 class _RecordScreenState extends State<RecordScreen> {
   late SoundRecorder _recorder;
-  //TODO Stream the breathing rate
+  Stream<int>? hrStream;
+  //TODO Stream the breathing rate and heart rate
 
+  bool isRecordingHR = false;
   int breathingRate = -2;
   @override
   void dispose() {
@@ -65,8 +68,29 @@ class _RecordScreenState extends State<RecordScreen> {
               ),
               child: const Text("Record Breathing Rate"),
             ),
-
-            //TODO When start recording, connect again coz first time we disconnect (connect in this, in setting connect store the identifier)
+            hrStream == null
+                ? const SizedBox.shrink() // Show nothing before recording
+                : StreamBuilder<int>(
+                  stream: hrStream,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Text("Error: ${snapshot.error}");
+                    } else if (!snapshot.hasData) {
+                      return const SizedBox.shrink(); // No data yet, show nothing
+                    } else {
+                      return Text(
+                        "Heart Rate: ${snapshot.data} bpm",
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.redAccent,
+                        ),
+                      );
+                    }
+                  },
+                ),
             Consumer<PolarConnectProvider>(
               builder: (context, polarConnectProvider, child) {
                 return ElevatedButton(
@@ -74,49 +98,64 @@ class _RecordScreenState extends State<RecordScreen> {
                     PolarConnect? polar =
                         polarConnectProvider.getPolarConnect();
                     if (polar == null) {
-                      // TODO Add alert pop up
-                      developer.log("Connect first");
+                      showDialog(
+                        context: context,
+                        builder:
+                            (context) => AlertDialog(
+                              title: const Text("Device Not Connected"),
+                              content: const Text(
+                                "Please connect to the Polar device in Settings.",
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  child: const Text("Cancel"),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(
+                                      context,
+                                    ).pop(); // Close the dialog
+                                    context.read<NavBarProvider>().changeIndex(
+                                      4,
+                                    ); // Go to settings tab
+                                  },
+                                  child: const Text("Go to Settings"),
+                                ),
+                              ],
+                            ),
+                      );
                     } else {
                       try {
-                        await polar.startRecording();
-                        developer.log("Recording done");
+                        if (!isRecordingHR) {
+                          // TODO Use riverpod to stream the data
+                          final stream = await polar.startRecording();
+                          setState(() {
+                            hrStream = stream;
+                            isRecordingHR = true;
+                          });
+                          developer.log("Recording started");
+                        } else {
+                          // Stop recording
+                          await polar.stopRecording();
+                          setState(() {
+                            hrStream = null;
+                            isRecordingHR = false;
+                          });
+                          developer.log("Recording stopped");
+                        }
                       } catch (e) {
-                        developer.log("Error in recording: $e");
+                        developer.log("HR recording error: $e");
                       }
                     }
                   },
-
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 112, 180, 236),
                     foregroundColor: Colors.black,
                   ),
-                  child: const Text("Record Heart Rate"),
-                );
-              },
-            ),
-            Consumer<PolarConnectProvider>(
-              builder: (context, polarConnectProvider, child) {
-                return ElevatedButton(
-                  onPressed: () async {
-                    PolarConnect? polar =
-                        polarConnectProvider.getPolarConnect();
-                    if (polar == null) {
-                      // TODO Add alert pop up
-                      developer.log("Already disconnected");
-                    } else {
-                      try {
-                        await polar.stopRecording();
-                      } catch (e) {
-                        developer.log("Error in stop recording: $e");
-                      }
-                    }
-                  },
-
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 112, 180, 236),
-                    foregroundColor: Colors.black,
+                  child: Text(
+                    isRecordingHR ? "Stop Recording HR" : "Record Heart Rate",
                   ),
-                  child: const Text("Stop Recording HR"),
                 );
               },
             ),
