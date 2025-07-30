@@ -13,6 +13,8 @@ class PolarConnect {
   StreamSubscription? ecgSubscription;
   StreamSubscription? accSubscription;
 
+  StreamController<int>? hrController;
+
   PolarConnect({required this.identifier});
 
   //TODO Add reconnect, see if connection gets broken
@@ -40,7 +42,8 @@ class PolarConnect {
     //TODO Add battery level
   }
 
-  Future<void> startRecording() async {
+  Future<Stream<int>> startRecording() async {
+    hrController = StreamController<int>();
     await connectToPolar();
     final availableTypes = await polar.getAvailableOnlineStreamDataTypes(
       identifier,
@@ -51,6 +54,7 @@ class PolarConnect {
       hrSubscription = polar.startHrStreaming(identifier).listen((data) {
         for (final sample in data.samples) {
           developer.log('HR: ${sample.hr} bpm');
+          hrController!.add(sample.hr);
         }
       }, onError: (err) => developer.log('HR streaming error: $err'));
     }
@@ -66,6 +70,7 @@ class PolarConnect {
         developer.log('ACC received with ${data.samples.length} samples');
       }, onError: (err) => developer.log('ACC streaming error: $err'));
     }
+    return hrController!.stream;
   }
 
   Future<void> stopRecording() async {
@@ -73,6 +78,7 @@ class PolarConnect {
       await hrSubscription?.cancel();
       await ecgSubscription?.cancel();
       await accSubscription?.cancel();
+      hrController?.close();
       await polar.disconnectFromDevice(identifier);
       developer.log('All streams cancelled and device disconnected.');
     } catch (e) {
