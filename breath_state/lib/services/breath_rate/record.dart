@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:typed_data';
+import 'package:breath_state/constants/db_constants.dart';
 import 'package:breath_state/services/breath_rate/process_data.dart';
 import 'package:breath_state/services/db_service/database_service.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -57,7 +58,7 @@ class SoundRecorder {
 
     int breathingRate = await P.calculateBreathRate();
 
-    await DatabaseService.instance.addData(breathingRate);
+    await DatabaseService.instance.addData(breathingRate,BREATH_TABLE_NAME);
 
     return breathingRate;
   }

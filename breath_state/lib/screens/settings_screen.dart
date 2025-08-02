@@ -1,5 +1,7 @@
+import 'package:breath_state/constants/file_constants.dart';
 import 'package:breath_state/providers/polar_connect_provider.dart';
 import 'package:breath_state/services/ble_service/ble_scanning.dart';
+import 'package:breath_state/services/file_service/file_write.dart';
 import 'package:breath_state/widgets/ble_device_select.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -14,6 +16,7 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   String? _selectDeviceUUID;
+  final fileSharer = FileWriterService();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,6 +46,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 backgroundColor: const Color.fromARGB(255, 112, 180, 236),
                 foregroundColor: const Color.fromARGB(255, 36, 10, 10),
               ),
+              //TODO Change text, if connected to polar device
               child: const Text("Connect to polar sensor"),
             ),
             SizedBox(height: 30),
@@ -51,6 +55,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 "Selected Device ID: $_selectDeviceUUID",
                 textAlign: TextAlign.center,
               ),
+            SizedBox(height: 50),
+            ElevatedButton(
+              onPressed: () async {
+                await fileSharer.shareFile(BREATH_FILE_NAME);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 112, 180, 236),
+                foregroundColor: const Color.fromARGB(255, 36, 10, 10),
+              ),
+              child: Text('Export Breathing Data'),
+            ),
           ],
         ),
       ),

@@ -17,6 +17,7 @@ class _RecordScreenState extends State<RecordScreen> {
   late SoundRecorder _recorder;
   Stream<int>? hrStream;
   //TODO Stream the breathing rate and heart rate
+  //TODO dispose polar connect
 
   bool isRecordingHR = false;
   int breathingRate = -2;

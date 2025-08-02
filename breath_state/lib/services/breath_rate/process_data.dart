@@ -1,5 +1,8 @@
 import 'dart:async';
 import 'dart:typed_data';
+import 'dart:developer' as developer;
+import 'package:breath_state/constants/file_constants.dart';
+import 'package:breath_state/services/file_service/file_write.dart';
 
 class ProcessData {
   late StreamController<List<Int16List>> recorderDataController;
@@ -7,6 +10,8 @@ class ProcessData {
   int numberOfSamples = 0; //To be used later for streaming
   int windowSize = 10;
   int minGap = 80;
+
+  final fileWriter = FileWriterService();
 
   Future<void> getStream(StreamController<List<Int16List>> recorder) async {
     recorderDataController = recorder;
@@ -41,6 +46,12 @@ class ProcessData {
       smoothed.add((sum / count).round());
     }
 
+    try {
+      await fileWriter.writeListToFile(smoothed, BREATH_FILE_NAME);
+    } catch (e) {
+      developer.log("Error writing raw data to file: $e");
+    }
+    
     // developer.log("Smoothed data: $smoothed");
 
     double average = smoothed.reduce((a, b) => a + b) / smoothed.length;
