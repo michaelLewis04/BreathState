@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:developer' as developer;
+import 'package:breath_state/constants/db_constants.dart';
+import 'package:breath_state/services/db_service/database_service.dart';
 import 'package:polar/polar.dart';
 
 //TODO Add permisions pop up for bluetooth
@@ -14,6 +16,8 @@ class PolarConnect {
   StreamSubscription? accSubscription;
 
   StreamController<int>? hrController;
+  Timer? saveTimer;
+  int? latestHr;
 
   PolarConnect({required this.identifier});
 
@@ -55,8 +59,15 @@ class PolarConnect {
         for (final sample in data.samples) {
           developer.log('HR: ${sample.hr} bpm');
           hrController!.add(sample.hr);
+          latestHr = sample.hr;
         }
       }, onError: (err) => developer.log('HR streaming error: $err'));
+      saveTimer = Timer.periodic(Duration(seconds: 5), (timer) async {
+        if (latestHr != null) {
+          await DatabaseService.instance.addData(latestHr!,HEART_TABLE_NAME);
+          developer.log('Saved HR: $latestHr');
+        }
+      });
     }
 
     if (availableTypes.contains(PolarDataType.ecg)) {

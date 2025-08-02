@@ -1,3 +1,4 @@
+import 'package:breath_state/constants/db_constants.dart';
 import 'package:breath_state/services/db_service/database_service.dart';
 import 'package:flutter/material.dart';
 
@@ -22,9 +23,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> loadData() async {
     final dbService = DatabaseService.instance;
-    final data = await dbService.getData();
+    final breathData = await dbService.getData(BREATH_TABLE_NAME);
+    final heartData = await dbService.getData(HEART_TABLE_NAME);
+
+    final combined = [
+      ...breathData.map((e) => {...e, 'type': 'breath'}),
+      ...heartData.map((e) => {...e, 'type': 'heart'}),
+    ];
+
     setState(() {
-      rows = data;
+      rows = combined;
       isLoading = false;
     });
   }
@@ -44,8 +52,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemCount: rows.length,
                   itemBuilder: (context, index) {
                     final row = rows[index];
+                    final type =
+                        row['type'] == 'heart'
+                            ? 'Heart Rate'
+                            : 'Breathing Rate';
                     return ListTile(
-                      title: Text("Date: ${row['date']}"),
+                      title: Text("$type - Date: ${row['date']}"),
                       subtitle: Text("Rate: ${row['rate']}"),
                     );
                   },
