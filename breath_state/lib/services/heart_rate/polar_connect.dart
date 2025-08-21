@@ -16,6 +16,7 @@ class PolarConnect {
   StreamSubscription? accSubscription;
 
   StreamController<int>? hrController;
+  StreamController<List<PolarEcgSample>>? ecgController;
   Timer? saveTimer;
   int? latestHr;
 
@@ -46,7 +47,7 @@ class PolarConnect {
     //TODO Add battery level
   }
 
-  Future<Stream<int>> startRecording() async {
+  Future<Stream<int>> getHeartRate() async {
     hrController = StreamController<int>();
     await connectToPolar();
     final availableTypes = await polar.getAvailableOnlineStreamDataTypes(
@@ -64,24 +65,31 @@ class PolarConnect {
       }, onError: (err) => developer.log('HR streaming error: $err'));
       saveTimer = Timer.periodic(Duration(seconds: 5), (timer) async {
         if (latestHr != null) {
-          await DatabaseService.instance.addData(latestHr!,HEART_TABLE_NAME);
+          await DatabaseService.instance.addData(latestHr!, HEART_TABLE_NAME);
           developer.log('Saved HR: $latestHr');
         }
       });
     }
+    return hrController!.stream;
+  }
 
+  Future<Stream<List<PolarEcgSample>>> getECG() async {
+    ecgController = StreamController<List<PolarEcgSample>>();
+    await connectToPolar();
+    final availableTypes = await polar.getAvailableOnlineStreamDataTypes(
+      identifier,
+    );
+    developer.log('Available data types: $availableTypes');
     if (availableTypes.contains(PolarDataType.ecg)) {
       ecgSubscription = polar.startEcgStreaming(identifier).listen((data) {
-        developer.log('ECG received with ${data.samples.length} samples');
+        for (final sample in data.samples) {
+          developer.log('ECG: ${sample.voltage} mV, Time: ${sample.timeStamp}');
+          //   // ecgController!.add(data.samples);
+        }
+        ecgController!.add(data.samples);
       }, onError: (err) => developer.log('ECG streaming error: $err'));
     }
-
-    if (availableTypes.contains(PolarDataType.acc)) {
-      accSubscription = polar.startAccStreaming(identifier).listen((data) {
-        developer.log('ACC received with ${data.samples.length} samples');
-      }, onError: (err) => developer.log('ACC streaming error: $err'));
-    }
-    return hrController!.stream;
+    return ecgController!.stream;
   }
 
   Future<void> stopRecording() async {
@@ -89,7 +97,11 @@ class PolarConnect {
       await hrSubscription?.cancel();
       await ecgSubscription?.cancel();
       await accSubscription?.cancel();
+
       hrController?.close();
+      ecgController?.close();
+
+      saveTimer?.cancel();
       await polar.disconnectFromDevice(identifier);
       developer.log('All streams cancelled and device disconnected.');
     } catch (e) {

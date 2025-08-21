@@ -3,6 +3,8 @@ import 'package:breath_state/providers/nav_bar_provider.dart';
 import 'package:breath_state/providers/polar_connect_provider.dart';
 import 'package:breath_state/services/breath_rate/record.dart';
 import 'package:breath_state/services/heart_rate/polar_connect.dart';
+import 'package:breath_state/services/resonance_service/res_freq.dart';
+import 'package:breath_state/services/resonance_service/rf_trainer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -14,8 +16,8 @@ class RecordScreen extends StatefulWidget {
 }
 
 class _RecordScreenState extends State<RecordScreen> {
-  late SoundRecorder _recorder;
-  Stream<int>? hrStream;
+  SoundRecorder? _recorder;
+  Stream<int>? _hrStream;
   //TODO Stream the breathing rate and heart rate
   //TODO dispose polar connect
 
@@ -23,7 +25,7 @@ class _RecordScreenState extends State<RecordScreen> {
   int breathingRate = -2;
   @override
   void dispose() {
-    _recorder.dispose();
+    _recorder?.dispose();
     super.dispose();
   }
 
@@ -59,7 +61,7 @@ class _RecordScreenState extends State<RecordScreen> {
                 _recorder = SoundRecorder();
                 breathingRate = -1;
                 setState(() {});
-                breathingRate = await _recorder.startRecord();
+                breathingRate = await _recorder!.startRecord();
                 setState(() {});
               },
 
@@ -69,10 +71,10 @@ class _RecordScreenState extends State<RecordScreen> {
               ),
               child: const Text("Record Breathing Rate"),
             ),
-            hrStream == null
+            _hrStream == null
                 ? const SizedBox.shrink() // Show nothing before recording
                 : StreamBuilder<int>(
-                  stream: hrStream,
+                  stream: _hrStream,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
@@ -130,9 +132,10 @@ class _RecordScreenState extends State<RecordScreen> {
                       try {
                         if (!isRecordingHR) {
                           // TODO Use riverpod to stream the data
-                          final stream = await polar.startRecording();
+                          final HrStream = await polar.getHeartRate();
+                          // await polar.getECG(); //Testing
                           setState(() {
-                            hrStream = stream;
+                            _hrStream = HrStream;
                             isRecordingHR = true;
                           });
                           developer.log("Recording started");
@@ -140,7 +143,7 @@ class _RecordScreenState extends State<RecordScreen> {
                           // Stop recording
                           await polar.stopRecording();
                           setState(() {
-                            hrStream = null;
+                            _hrStream = null;
                             isRecordingHR = false;
                           });
                           developer.log("Recording stopped");
@@ -157,6 +160,62 @@ class _RecordScreenState extends State<RecordScreen> {
                   child: Text(
                     isRecordingHR ? "Stop Recording HR" : "Record Heart Rate",
                   ),
+                );
+              },
+            ),
+            SizedBox(height: 10),
+            Consumer<PolarConnectProvider>(
+              builder: (context, polarConnectProvider, child) {
+                return ElevatedButton(
+                  onPressed: () async {
+                    PolarConnect? polar =
+                        polarConnectProvider.getPolarConnect();
+                    if (polar == null) {
+                      showDialog(
+                        context: context,
+                        builder:
+                            (context) => AlertDialog(
+                              title: const Text("Device Not Connected"),
+                              content: const Text(
+                                "Please connect to the Polar device in Settings.",
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  child: const Text("Cancel"),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(
+                                      context,
+                                    ).pop(); // Close the dialog
+                                    context.read<NavBarProvider>().changeIndex(
+                                      4,
+                                    ); // Go to settings tab
+                                  },
+                                  child: const Text("Go to Settings"),
+                                ),
+                              ],
+                            ),
+                      );
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (_) => ResonanceFrequencyTrainer(
+                                rf: ResonanceFrequency(),
+                                polar: polar,
+                              ),
+                        ),
+                      );
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 112, 180, 236),
+                    foregroundColor: Colors.black,
+                  ),
+                  child: const Text("Measure Resonance Frequency"),
                 );
               },
             ),

@@ -6,11 +6,14 @@ class GuidedBreathing extends StatefulWidget {
   final Duration holdDuration;
   final Duration exhaleDuration;
 
+  final bool showStopButton;
+
   const GuidedBreathing({
     super.key,
     required this.inhaleDuration,
     required this.holdDuration,
     required this.exhaleDuration,
+    this.showStopButton = true,
   });
 
   @override
@@ -104,15 +107,22 @@ class _GuidedBreathingState extends State<GuidedBreathing>
 
   void _startCountdown(Duration duration) {
     _countdownTimer?.cancel();
-    int seconds = duration.inSeconds;
-    setState(() => _phaseSecondsLeft = seconds);
 
-    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_phaseSecondsLeft == 1) {
+    // total ms left
+    int msLeft = duration.inMilliseconds;
+    setState(() => _phaseSecondsLeft = (msLeft / 1000).ceil());
+
+    _countdownTimer = Timer.periodic(const Duration(milliseconds: 200), (
+      timer,
+    ) {
+      msLeft -= 200;
+
+      if (msLeft <= 0) {
         timer.cancel();
         setState(() => _phaseSecondsLeft = 0);
       } else {
-        setState(() => _phaseSecondsLeft--);
+        // Update text every 200ms instead of whole second
+        setState(() => _phaseSecondsLeft = (msLeft / 1000).ceil());
       }
     });
   }
@@ -205,17 +215,18 @@ class _GuidedBreathingState extends State<GuidedBreathing>
                 ),
               ],
             ),
-            const SizedBox(height: 150),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.redAccent,
-                foregroundColor: Colors.white,
+            if (widget.showStopButton) const SizedBox(height: 150),
+            if (widget.showStopButton)
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.redAccent,
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text("Stop"),
               ),
-              child: const Text("Stop"),
-            ),
           ],
         ),
       ),
