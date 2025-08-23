@@ -10,7 +10,7 @@ class ResonanceFrequency {
 
   final Map<double, double> rmssdResults = {};
 
-  final int _timeInterval = 70;
+  final int _timeInterval = 65;//TODO- To be changed
 
   final int _smoothWindowSize = 10;
   final int _minGapMs = 200;

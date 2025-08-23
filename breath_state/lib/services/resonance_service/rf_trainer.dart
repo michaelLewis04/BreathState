@@ -93,40 +93,40 @@ class _ResonanceFrequencyTrainerState extends State<ResonanceFrequencyTrainer> {
     return Scaffold(
       appBar: AppBar(title: const Text("Resonance Frequency Test")),
       body: Center(
-        child: _isRunning
-            ? Column(
-                // mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "Testing rate: $_currentRate BPM",
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
+        child:
+            _isRunning
+                ? Column(
+                  // mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Testing rate: $_currentRate BPM",
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  SizedBox(
-                    height: 200,
-                    child: GuidedBreathing(
-                      inhaleDuration: Duration(milliseconds: inhaleMs),
-                      holdDuration: Duration.zero,
-                      exhaleDuration: Duration(milliseconds: exhaleMs),
-                      showStopButton: false,
+                    const SizedBox(height: 20),
+                    Expanded(
+                      child: GuidedBreathing(
+                        inhaleDuration: Duration(milliseconds: inhaleMs),
+                        holdDuration: Duration.zero,
+                        exhaleDuration: Duration(milliseconds: exhaleMs),
+                        showStopButton: false,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  const CircularProgressIndicator(),
-                ],
-              )
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text("Test completed!"),
-                  Text(
-                    "Best rate: ${widget.rf.getResonanceBreathingRate()} BPM",
-                  ),
-                ],
-              ),
+
+                    const SizedBox(height: 20)
+                  ],
+                )
+                : Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text("Test completed!"),
+                    Text(
+                      "Best rate: ${widget.rf.getResonanceBreathingRate()} BPM",
+                    ),
+                  ],
+                ),
       ),
     );
   }
