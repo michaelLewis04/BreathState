@@ -14,6 +14,8 @@ class SettingsScreen extends StatefulWidget {
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
+//TODO Add a connection status indicator
+
 class _SettingsScreenState extends State<SettingsScreen> {
   String? _selectDeviceUUID;
   final fileSharer = FileWriterService();

@@ -13,7 +13,7 @@ class SoundRecorder {
   final int kSAMPLERATE = 8000;
   final int kNUMBEROFCHANNELS = 1;
 
-  late var recorderDataController;
+  StreamController<List<Int16List>> ?recorderDataController;
 
   //TODO :Make open Recorder in initState
 
@@ -45,12 +45,12 @@ class SoundRecorder {
       codec: Codec.pcm16,
       sampleRate: kSAMPLERATE,
       numChannels: kNUMBEROFCHANNELS,
-      toStreamInt16: recorderDataController.sink,
+      toStreamInt16: recorderDataController!.sink,
     );
 
     ProcessData P = ProcessData();
 
-    P.getStream(recorderDataController);
+    P.getStream(recorderDataController!);
 
     await Future.delayed(const Duration(seconds: 30));
 
@@ -74,6 +74,6 @@ class SoundRecorder {
   }
 
   void dispose() {
-    recorderDataController.close();
+    recorderDataController?.close();
   }
 }
