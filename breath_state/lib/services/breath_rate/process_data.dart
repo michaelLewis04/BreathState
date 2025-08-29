@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 import 'dart:developer' as developer;
+import 'dart:convert';
 import 'package:breath_state/constants/file_constants.dart';
 import 'package:breath_state/services/file_service/file_write.dart';
 
@@ -18,7 +19,6 @@ class ProcessData {
     await for (var value in recorderDataController.stream) {
       for (var chunk in value) {
         int average = (chunk.reduce((a, b) => a + b) ~/ chunk.length).abs();
-        // developer.log("data: ${average}");
         numberOfSamples += chunk.length;
         averageStreamList.add(average);
       }
@@ -27,8 +27,6 @@ class ProcessData {
 
   Future<int> calculateBreathRate() async {
     List<int> amplitudes = averageStreamList;
-
-    // developer.log("Raw data: $amplitudes");
 
     List<int> smoothed = [];
 
@@ -46,16 +44,7 @@ class ProcessData {
       smoothed.add((sum / count).round());
     }
 
-    try {
-      await fileWriter.writeListToFile(smoothed, BREATH_FILE_NAME);
-    } catch (e) {
-      developer.log("Error writing raw data to file: $e");
-    }
-    
-    // developer.log("Smoothed data: $smoothed");
-
     double average = smoothed.reduce((a, b) => a + b) / smoothed.length;
-    // developer.log("Average of smoothed data: $average");
 
     int numberOfPeaks = 0;
     bool above = false;
@@ -75,11 +64,20 @@ class ProcessData {
       }
     }
 
-    double bpm =
-        numberOfPeaks *
-        (60.0 /
-            30.0); // Change if we are stopping/streaming...Rn recording only for 30 seconds
+    double bpm = numberOfPeaks * (60.0 / 30.0);
     // developer.log("Breathing rate = ${bpm.toStringAsFixed(2)} BPM");
+    final timestamp = DateTime.now().toIso8601String();
+    final data = {
+      "timestamp": timestamp,
+      "breathingRate": double.parse(bpm.toStringAsFixed(2)),
+      "smoothedData": smoothed,
+    };
+
+    try {
+      await fileWriter.writeStringToFile(jsonEncode(data), BREATH_FILE_NAME);
+    } catch (e) {
+      developer.log("Error saving breathing data as JSON: $e");
+    }
 
     return bpm.round();
   }
