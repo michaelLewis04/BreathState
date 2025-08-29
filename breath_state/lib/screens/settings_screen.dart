@@ -49,24 +49,86 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 foregroundColor: const Color.fromARGB(255, 36, 10, 10),
               ),
               //TODO Change text, if connected to polar device
-              child: const Text("Connect to polar sensor"),
+              child: const Text("Connect to Polar Sensor"),
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
             if (_selectDeviceUUID != null)
               Text(
                 "Selected Device ID: $_selectDeviceUUID",
                 textAlign: TextAlign.center,
               ),
-            SizedBox(height: 50),
+            const SizedBox(height: 50),
             ElevatedButton(
               onPressed: () async {
-                await fileSharer.shareFile(BREATH_FILE_NAME);
+                showDialog(
+                  context: context,
+                  builder:
+                      (context) => AlertDialog(
+                        title: const Text(
+                          "Export Data",
+                          textAlign: TextAlign.center, // Center title
+                        ),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text(
+                              "Choose which data file to share",
+                              textAlign:
+                                  TextAlign.center, // Center content text
+                            ),
+                            const SizedBox(height: 20),
+                            SizedBox(
+                              width: double.infinity, // ✅ full width button
+                              child: ElevatedButton(
+                                onPressed: () async {
+                                  Navigator.of(context).pop();
+                                  await fileSharer.shareFile(BREATH_FILE_NAME);
+                                },
+                                child: const Text(
+                                  "Breathing Data",
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            SizedBox(
+                              width: double.infinity, // ✅ full width button
+                              child: ElevatedButton(
+                                onPressed: () async {
+                                  Navigator.of(context).pop();
+                                  await fileSharer.shareFile(ECG_FILE_NAME);
+                                },
+                                child: const Text(
+                                  "ECG Data",
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            SizedBox(
+                              width: double.infinity, // ✅ full width button
+                              child: ElevatedButton(
+                                onPressed: () => Navigator.of(context).pop(),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.grey[300],
+                                  foregroundColor: Colors.black,
+                                ),
+                                child: const Text(
+                                  "Cancel",
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color.fromARGB(255, 112, 180, 236),
                 foregroundColor: const Color.fromARGB(255, 36, 10, 10),
               ),
-              child: Text('Export Breathing Data'),
+              child: const Text("Export Data"),
             ),
           ],
         ),

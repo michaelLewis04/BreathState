@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 import 'dart:math';
+import 'dart:convert';
 import 'package:polar/polar.dart';
 import 'package:breath_state/services/heart_rate/polar_connect.dart';
+import 'package:breath_state/services/file_service/file_write.dart';
+import 'package:breath_state/constants/file_constants.dart';
 
 class ResonanceFrequency {
   final List<PolarEcgSample> _ecgBuffer = [];
@@ -17,6 +20,8 @@ class ResonanceFrequency {
 
   PolarConnect? _polar;
   StreamSubscription? _ecgSub;
+
+  final fileWriter = FileWriterService();
 
   ResonanceFrequency();
 
@@ -54,8 +59,22 @@ class ResonanceFrequency {
 
     developer.log("ECG data so far: ${_ecgBuffer.length} samples");
 
-    _detectRPeaks(_ecgBuffer);
+    List<double> smoothed = _detectRPeaks(_ecgBuffer);
 
+    try {
+      final timestamp = DateTime.now().toIso8601String();
+      final data = {
+        "timestamp": timestamp,
+        "breathingRate": breathingRate,
+        "ecgSmoothed": smoothed,
+      };
+      await fileWriter.writeStringToFile(
+        jsonEncode(data),
+        ECG_FILE_NAME, 
+      );
+    } catch (e) {
+      developer.log("Error saving ECG data: $e");
+    }
     List<int> rrIntervals = [];
     for (int i = 1; i < _rPeaksTimestamps.length; i++) {
       rrIntervals.add(_rPeaksTimestamps[i] - _rPeaksTimestamps[i - 1]);
@@ -70,7 +89,7 @@ class ResonanceFrequency {
     await _ecgSub?.cancel();
   }
 
-  void _detectRPeaks(List<PolarEcgSample> samples) {
+  List<double> _detectRPeaks(List<PolarEcgSample> samples) {
     _rPeaksTimestamps.clear();
 
     List<double> smoothed = [];
@@ -81,7 +100,7 @@ class ResonanceFrequency {
       for (int j = start; j <= end; j++) {
         sum += samples[j].voltage.toDouble();
       }
-      smoothed.add(sum / (end - start + 1));
+      smoothed.add(double.parse((sum / (end - start + 1)).toStringAsFixed(3)));
     }
 
     double avgVoltage = smoothed.reduce((a, b) => a + b) / smoothed.length;
@@ -103,6 +122,7 @@ class ResonanceFrequency {
         above = false;
       }
     }
+    return smoothed;
   }
 
   double _calculateRMSSD(List<int> rr) {
