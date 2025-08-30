@@ -81,6 +81,12 @@ class _ResonanceFrequencyTrainerState extends State<ResonanceFrequencyTrainer> {
   @override
   void dispose() {
     _stepTimer?.cancel(); // cancel running timer to prevent leaks
+    try {
+      widget.polar.stopRecording();
+      developer.log("Polar recording stopped in dispose()");
+    } catch (e) {
+      developer.log("Error stopping Polar recording in dispose(): $e");
+    }
     super.dispose();
   }
 
@@ -115,7 +121,7 @@ class _ResonanceFrequencyTrainerState extends State<ResonanceFrequencyTrainer> {
                       ),
                     ),
 
-                    const SizedBox(height: 20)
+                    const SizedBox(height: 20),
                   ],
                 )
                 : Column(
