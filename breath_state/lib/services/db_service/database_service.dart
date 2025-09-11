@@ -33,7 +33,6 @@ class DatabaseService {
     return database;
   }
 
-  //TODO Add collum, table, db names in constants
   Future<void> addData(int rate, String tableName) async {
     Database db = await database;
     final now = DateTime.now();

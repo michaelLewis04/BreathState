@@ -26,6 +26,7 @@ class _RecordScreenState extends State<RecordScreen> {
   @override
   void dispose() {
     _recorder?.dispose();
+    _stopHRRecording();
     super.dispose();
   }
 
