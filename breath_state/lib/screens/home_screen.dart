@@ -194,10 +194,17 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text("Breathing Records"),
+        title: const Text(
+          "Home",
+          style: TextStyle(
+            fontWeight: FontWeight.w900,
+            fontSize: 24,
+            letterSpacing: 1.2,
+            color: Color.fromARGB(255, 185, 184, 184),
+          ),
+        ),
         centerTitle: true,
         backgroundColor: Colors.black,
-        foregroundColor: Colors.white,
         elevation: 0,
       ),
       body:
