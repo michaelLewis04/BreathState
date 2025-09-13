@@ -97,7 +97,16 @@ class _ResonanceFrequencyTrainerState extends State<ResonanceFrequencyTrainer> {
     final exhaleMs = inhaleMs;
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Resonance Frequency Test")),
+      backgroundColor: const Color.fromARGB(255, 53, 53, 53),
+      appBar: AppBar(
+        title: const Text(
+          "Resonance Frequency Test",
+          style: TextStyle(color: Colors.white), // White appbar text
+        ),
+        backgroundColor: const Color.fromARGB(255, 53, 53, 53),
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
       body: Center(
         child:
             _isRunning
@@ -106,11 +115,30 @@ class _ResonanceFrequencyTrainerState extends State<ResonanceFrequencyTrainer> {
                   children: [
                     Text(
                       "Testing rate: $_currentRate BPM",
-                      style: const TextStyle(
-                        fontSize: 24,
+                      style: TextStyle(
+                        fontSize: 28, 
                         fontWeight: FontWeight.bold,
+                        foreground:
+                            Paint()
+                              ..shader = const LinearGradient(
+                                colors: <Color>[
+                                  Colors.lightBlueAccent,
+                                  Colors.cyanAccent,
+                                ],
+                              ).createShader(
+                                const Rect.fromLTWH(0.0, 0.0, 200.0, 70.0),
+                              ),
+                        shadows: [
+                          Shadow(
+                            blurRadius: 8.0,
+                            color: Colors.black.withOpacity(0.6),
+                            offset: const Offset(2, 2),
+                          ),
+                        ],
                       ),
+                      textAlign: TextAlign.center,
                     ),
+
                     const SizedBox(height: 20),
                     Expanded(
                       child: GuidedBreathing(
