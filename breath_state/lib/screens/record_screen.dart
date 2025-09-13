@@ -40,8 +40,6 @@ class _RecordScreenState extends State<RecordScreen> {
         breathingRate = -1;
         isRecordingBR = true;
       });
-
-      // run BR asynchronously without blocking HR
       _recorder!.startRecord().then((rate) {
         if (mounted) {
           setState(() {
@@ -164,116 +162,166 @@ class _RecordScreenState extends State<RecordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black, // Dark background
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            if (breathingRate == -2)
-              const Text("Let's calculate breathing rate (30s)")
-            else if (breathingRate == -1)
-              const Text("Calculating...")
-            else ...[
-              const Text(
-                "Breathing Rate(per min):",
-                style: TextStyle(fontSize: 24),
-              ),
-              Text(
-                "$breathingRate",
-                style: const TextStyle(
-                  fontSize: 72,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              if (breathingRate == -2)
+                const Text(
+                  "Recording will take ~30 seconds",
+                  style: TextStyle(color: Colors.white70, fontSize: 16),
+                )
+              else if (breathingRate == -1)
+                const Text(
+                  "Calculating...",
+                  style: TextStyle(color: Colors.white70, fontSize: 18),
+                )
+              else ...[
+                const Text(
+                  "Breathing Rate (per min):",
+                  style: TextStyle(fontSize: 22, color: Colors.white70),
                 ),
+                Text(
+                  "$breathingRate",
+                  style: const TextStyle(
+                    fontSize: 72,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.lightBlueAccent,
+                  ),
+                ),
+              ],
+              _hrStream == null
+                  ? const SizedBox.shrink()
+                  : StreamBuilder<int>(
+                    stream: _hrStream,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Text(
+                          "Error: ${snapshot.error}",
+                          style: const TextStyle(color: Colors.redAccent),
+                        );
+                      } else if (!snapshot.hasData) {
+                        return const SizedBox.shrink();
+                      } else {
+                        return Text(
+                          "Heart Rate: ${snapshot.data} bpm",
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.redAccent,
+                          ),
+                        );
+                      }
+                    },
+                  ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: isRecordingHR ? _stopHRRecording : _showRecordDialog,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  isRecordingHR ? "Stop Recording" : "Select Recording Options",
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Consumer<PolarConnectProvider>(
+                builder: (context, polarConnectProvider, child) {
+                  return Column(
+                    children: [
+                      const SizedBox(height: 28),
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          PolarConnect? polar =
+                              polarConnectProvider.getPolarConnect();
+                          if (polar == null) {
+                            showDialog(
+                              context: context,
+                              builder:
+                                  (context) => AlertDialog(
+                                    title: const Text("Device Not Connected"),
+                                    content: const Text(
+                                      "Please connect to the Polar device in Settings.",
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed:
+                                            () => Navigator.of(context).pop(),
+                                        child: const Text("Cancel"),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                          context
+                                              .read<NavBarProvider>()
+                                              .changeIndex(4);
+                                        },
+                                        child: const Text("Go to Settings"),
+                                      ),
+                                    ],
+                                  ),
+                            );
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (_) => ResonanceFrequencyTrainer(
+                                      rf: ResonanceFrequency(),
+                                      polar: polar,
+                                    ),
+                              ),
+                            );
+                          }
+                        },
+                        icon: const Icon(
+                          Icons.auto_awesome,
+                          color: Colors.tealAccent,
+                        ),
+                        label: const Text("Measure Resonance Frequency"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color.fromARGB(
+                            255,
+                            43,
+                            43,
+                            43,
+                          ),
+                          foregroundColor: Colors.tealAccent.shade200,
+                          side: BorderSide(
+                            color: Colors.tealAccent.shade200,
+                            width: 1.5,
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          elevation: 0,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                    ],
+                  );
+                },
               ),
             ],
-            _hrStream == null
-                ? const SizedBox.shrink()
-                : StreamBuilder<int>(
-                  stream: _hrStream,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    } else if (snapshot.hasError) {
-                      return Text("Error: ${snapshot.error}");
-                    } else if (!snapshot.hasData) {
-                      return const SizedBox.shrink();
-                    } else {
-                      return Text(
-                        "Heart Rate: ${snapshot.data} bpm",
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.redAccent,
-                        ),
-                      );
-                    }
-                  },
-                ),
-            ElevatedButton(
-              onPressed: isRecordingHR ? _stopHRRecording : _showRecordDialog,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 112, 180, 236),
-                foregroundColor: Colors.black,
-              ),
-              child: Text(
-                isRecordingHR ? "Stop Recording" : "Select Recording Options",
-              ),
-            ),
-            const SizedBox(height: 10),
-            Consumer<PolarConnectProvider>(
-              builder: (context, polarConnectProvider, child) {
-                return ElevatedButton(
-                  onPressed: () async {
-                    PolarConnect? polar =
-                        polarConnectProvider.getPolarConnect();
-                    if (polar == null) {
-                      showDialog(
-                        context: context,
-                        builder:
-                            (context) => AlertDialog(
-                              title: const Text("Device Not Connected"),
-                              content: const Text(
-                                "Please connect to the Polar device in Settings.",
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.of(context).pop(),
-                                  child: const Text("Cancel"),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                    context.read<NavBarProvider>().changeIndex(
-                                      4,
-                                    );
-                                  },
-                                  child: const Text("Go to Settings"),
-                                ),
-                              ],
-                            ),
-                      );
-                    } else {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder:
-                              (_) => ResonanceFrequencyTrainer(
-                                rf: ResonanceFrequency(),
-                                polar: polar,
-                              ),
-                        ),
-                      );
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 112, 180, 236),
-                    foregroundColor: Colors.black,
-                  ),
-                  child: const Text("Measure Resonance Frequency"),
-                );
-              },
-            ),
-          ],
+          ),
         ),
       ),
     );
