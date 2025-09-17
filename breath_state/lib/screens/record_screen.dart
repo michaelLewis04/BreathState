@@ -171,7 +171,7 @@ class _RecordScreenState extends State<RecordScreen> {
             children: [
               if (breathingRate == -2)
                 const Text(
-                  "Recording will take ~30 seconds",
+                  "Breathing rate will take ~30 seconds",
                   style: TextStyle(color: Colors.white70, fontSize: 16),
                 )
               else if (breathingRate == -1)
