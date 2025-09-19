@@ -1,6 +1,5 @@
 import 'package:breath_state/providers/nav_bar_provider.dart';
 import 'package:breath_state/providers/polar_connect_provider.dart';
-import 'package:breath_state/screens/doctor_screen.dart';
 import 'package:breath_state/screens/record_screen.dart';
 import 'package:breath_state/screens/settings_screen.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +34,6 @@ class _MyAppState extends State<MyApp> {
     HomeScreen(),
     GuidedBreathingScreen(),
     RecordScreen(),
-    DoctorScreen(),
     SettingsScreen(),
   ];
 

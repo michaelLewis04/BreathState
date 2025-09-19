@@ -8,7 +8,7 @@
 
     <!--TODO : Remove sdk version 30-->
     <application
-        android:label="breath_state"
+        android:label="Breath State"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
