@@ -36,10 +36,6 @@ class BottomNavBar extends StatelessWidget {
               label: 'Record',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.medical_services),
-              label: 'Doctor',
-            ),
-            BottomNavigationBarItem(
               icon: Icon(Icons.settings),
               label: 'Settings',
             ),

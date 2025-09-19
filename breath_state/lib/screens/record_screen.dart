@@ -71,7 +71,7 @@ class _RecordScreenState extends State<RecordScreen> {
                     TextButton(
                       onPressed: () {
                         Navigator.of(context).pop();
-                        context.read<NavBarProvider>().changeIndex(4);
+                        context.read<NavBarProvider>().changeIndex(3);
                       },
                       child: const Text("Go to Settings"),
                     ),
@@ -268,7 +268,7 @@ class _RecordScreenState extends State<RecordScreen> {
                                           Navigator.of(context).pop();
                                           context
                                               .read<NavBarProvider>()
-                                              .changeIndex(4);
+                                              .changeIndex(3);
                                         },
                                         child: const Text("Go to Settings"),
                                       ),

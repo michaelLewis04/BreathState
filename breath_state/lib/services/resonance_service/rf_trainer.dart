@@ -116,7 +116,7 @@ class _ResonanceFrequencyTrainerState extends State<ResonanceFrequencyTrainer> {
                     Text(
                       "Testing rate: $_currentRate BPM",
                       style: TextStyle(
-                        fontSize: 28, 
+                        fontSize: 28,
                         fontWeight: FontWeight.bold,
                         foreground:
                             Paint()
@@ -155,9 +155,55 @@ class _ResonanceFrequencyTrainerState extends State<ResonanceFrequencyTrainer> {
                 : Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text("Test completed!"),
+                    // Success Icon
+                    const Icon(
+                      Icons.check_circle,
+                      color: Colors.greenAccent,
+                      size: 80,
+                    ),
+                    const SizedBox(height: 20),
+
+                    // "Test Completed!" Title
+                    ShaderMask(
+                      shaderCallback:
+                          (bounds) => const LinearGradient(
+                            colors: [Colors.lightBlueAccent, Colors.cyanAccent],
+                          ).createShader(bounds),
+                      child: const Text(
+                        "Test Completed!",
+                        style: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 30),
                     Text(
-                      "Best rate: ${widget.rf.getResonanceBreathingRate()} BPM",
+                      "Best Rate",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey[300],
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+
+                    Text(
+                      "${widget.rf.getResonanceBreathingRate()} BPM",
+                      style: const TextStyle(
+                        fontSize: 40,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.cyanAccent,
+                        shadows: [
+                          Shadow(
+                            blurRadius: 12.0,
+                            color: Colors.black54,
+                            offset: Offset(3, 3),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
