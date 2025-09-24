@@ -38,7 +38,7 @@ class _ResonanceFrequencyTrainerState extends State<ResonanceFrequencyTrainer> {
   void _startTest() {
     setState(() => _isRunning = true);
 
-    _runStep(); // start first breathing step
+    _runStep(); 
   }
 
   Future<void> _runStep() async {
@@ -49,22 +49,19 @@ class _ResonanceFrequencyTrainerState extends State<ResonanceFrequencyTrainer> {
 
     developer.log("Starting test at $_currentRate BPM");
 
-    // Start RMSSD measurement in parallel
     widget.rf.calculateRMSSDForBreathingRate(
       breathingRate: _currentRate,
       polar: widget.polar,
     );
 
-    // Start a 90s timer for this breathing rate
     _stepTimer = Timer(_testDuration, () {
       if (!mounted) return;
 
-      // increment BPM after 90s
       setState(() {
         _currentRate = double.parse((_currentRate + _step).toStringAsFixed(1));
       });
 
-      _runStep(); // recursively move to next step
+      _runStep(); 
     });
   }
 
@@ -80,7 +77,7 @@ class _ResonanceFrequencyTrainerState extends State<ResonanceFrequencyTrainer> {
 
   @override
   void dispose() {
-    _stepTimer?.cancel(); // cancel running timer to prevent leaks
+    _stepTimer?.cancel(); 
     try {
       widget.polar.stopRecording();
       developer.log("Polar recording stopped in dispose()");
@@ -101,7 +98,7 @@ class _ResonanceFrequencyTrainerState extends State<ResonanceFrequencyTrainer> {
       appBar: AppBar(
         title: const Text(
           "Resonance Frequency Test",
-          style: TextStyle(color: Colors.white), // White appbar text
+          style: TextStyle(color: Colors.white), 
         ),
         backgroundColor: const Color.fromARGB(255, 53, 53, 53),
         elevation: 0,
@@ -155,15 +152,12 @@ class _ResonanceFrequencyTrainerState extends State<ResonanceFrequencyTrainer> {
                 : Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Success Icon
                     const Icon(
                       Icons.check_circle,
                       color: Colors.greenAccent,
                       size: 80,
                     ),
                     const SizedBox(height: 20),
-
-                    // "Test Completed!" Title
                     ShaderMask(
                       shaderCallback:
                           (bounds) => const LinearGradient(
