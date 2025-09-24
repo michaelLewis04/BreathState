@@ -8,6 +8,8 @@ import 'package:breath_state/services/file_service/file_write.dart';
 import 'package:breath_state/constants/file_constants.dart';
 
 class ResonanceFrequency {
+
+  static double userResonanceFreq=0;
   final List<PolarEcgSample> _ecgBuffer = [];
   final List<int> _rPeaksTimestamps = [];
 
@@ -141,8 +143,9 @@ class ResonanceFrequency {
       return 0.0;
     }
     double maxRmssd = rmssdResults.values.reduce(max);
-    return rmssdResults.entries
+    userResonanceFreq= rmssdResults.entries
         .firstWhere((entry) => entry.value == maxRmssd)
         .key;
+    return userResonanceFreq;
   }
 }
