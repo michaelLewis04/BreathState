@@ -1,5 +1,8 @@
+import 'package:breath_state/providers/nav_bar_provider.dart';
+import 'package:breath_state/services/resonance_service/res_freq.dart';
 import 'package:flutter/material.dart';
 import 'package:breath_state/widgets/guided_breathing.dart';
+import 'package:provider/provider.dart';
 
 class GuidedBreathingScreen extends StatelessWidget {
   const GuidedBreathingScreen({super.key});
@@ -32,12 +35,12 @@ class GuidedBreathingScreen extends StatelessWidget {
         exhale: 8,
       ),
       _BreathingOption(
-        title: "Extended Breathing",
-        description: "Long, deep exhale",
+        title: "Resonance Frequency",
+        description: "Your personalized breathing rate",
         color: Colors.orangeAccent,
-        inhale: 3,
+        inhale: 0, 
         hold: 0,
-        exhale: 9,
+        exhale: 0,
       ),
     ];
 
@@ -81,7 +84,7 @@ class GuidedBreathingScreen extends StatelessWidget {
                 itemCount: breathingOptions.length,
                 itemBuilder: (context, index) {
                   final option = breathingOptions[index];
-                  return _BreathingCard(option: option);
+                  return _BreathingCard(option: option, index: index);
                 },
               ),
             ),
@@ -112,24 +115,67 @@ class _BreathingOption {
 
 class _BreathingCard extends StatelessWidget {
   final _BreathingOption option;
+  final int index;
 
-  const _BreathingCard({required this.option});
+  const _BreathingCard({required this.option, required this.index});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder:
-                (context) => GuidedBreathing(
-                  inhaleDuration: Duration(seconds: option.inhale),
-                  holdDuration: Duration(seconds: option.hold),
-                  exhaleDuration: Duration(seconds: option.exhale),
-                ),
-          ),
-        );
+        if (index == 3) {
+          final freq = ResonanceFrequency.userResonanceFreq;
+          if (freq == 0) {
+            showDialog(
+              context: context,
+              builder:
+                  (ctx) => AlertDialog(
+                    title: const Text("Resonance Frequency Needed"),
+                    content: const Text(
+                      "You need to measure your resonance frequency first before starting guided breathing.",
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          context.read<NavBarProvider>().changeIndex(2);
+                        },
+                        child: const Text("OK"),
+                      ),
+                    ],
+                  ),
+            );
+          } else {
+            final cycleDurationMs = (60000 / freq).round();
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (context) => GuidedBreathing(
+                      inhaleDuration: Duration(
+                        milliseconds: cycleDurationMs ~/ 2,
+                      ),
+                      holdDuration: const Duration(milliseconds: 0),
+                      exhaleDuration: Duration(
+                        milliseconds: cycleDurationMs ~/ 2,
+                      ),
+                    ),
+              ),
+            );
+          }
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder:
+                  (context) => GuidedBreathing(
+                    inhaleDuration: Duration(seconds: option.inhale),
+                    holdDuration: Duration(seconds: option.hold),
+                    exhaleDuration: Duration(seconds: option.exhale),
+                  ),
+            ),
+          );
+        }
       },
       borderRadius: BorderRadius.circular(20),
       child: AnimatedContainer(
