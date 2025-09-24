@@ -2,7 +2,7 @@
 
 **An open-source Android/iOS and PC app for breathing and heart-rate synchronization**
 
-![BreathState Logo](assets/logo.png)
+![BreathState Logo](breath_state/assets/logo.png)
 
 ---
 
